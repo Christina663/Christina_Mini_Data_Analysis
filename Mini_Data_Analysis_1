@@ -1,0 +1,42 @@
+---
+title: "Milestone 1"
+author: "Christina"
+date: "10/5/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+
+## Task 1: Choose your favorite dataset (10 points)
+
+**1.1 Choose 4 datasets:**
+
+1: cancer_sample
+2: apt_buildings 
+3: steam_games
+4: vancouver_trees
+
+**1.2 Explore the datasets:**
+
+1. cancer_sample:
+```{r cancer}
+cancer_sample
+#head(cancer_sample)
+```
