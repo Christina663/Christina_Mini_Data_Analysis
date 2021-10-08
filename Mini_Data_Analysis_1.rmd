@@ -65,3 +65,42 @@ Second, the dataset "cancer_sample" contains almost only numerical data. However
 We have chosen the dataset "vancouver_trees" to investigate. We are interested for two reasons: 
 1. As mentioned, this dataset has various data types of categorical, binary and numerical, which will make our practice of data wrangling more thorough.
 2. I am interested in potentially investigate the spread of tree species among different regions and roads of Vancouver, and possibly form a comprehensive graph. Another possible direction is the relationship between heights, diameters and date planted of individual trees and how trees are spread within different regions.
+
+## Task 2: Exploring your dataset (15 points)
+
+**Exercise 1: Plot Density of Diameter**
+```{r Plot Density}
+# Plot the density of diameter and distinguish by curb
+ggplot(vancouver_trees, aes(x = diameter)) + geom_density(aes(fill = curb),alpha = 0.3)
+max(select(vancouver_trees,diameter))
+# We discovered that very few trees are of large diameters, so we can take them off to make the density plot more visible
+large_diameter_removed <- filter(vancouver_trees, diameter < 70)
+ggplot(large_diameter_removed, aes(x = diameter)) + geom_density(aes(fill = curb),alpha = 0.3)
+# We observed that the distribution of tree diameters are centralized around 5, and the distribution are very similar for both on curb or not on curb.
+```
+
+**Exercise 2:Plot Distribution of "Date_planted"**
+
+```{r Plot Distribution}
+# arrange(vancouver_trees, date_planted)
+ggplot(vancouver_trees, aes(date_planted)) + geom_histogram(bins = 30)
+```
+
+**Exercise 3: Plot Variable Relationship between "Diameter", "Neighbourhood_name" and "Date_planted"**
+```{r Plot Variable Relationship}
+ggplot(vancouver_trees, aes(neighbourhood_name, date_planted)) + geom_point(size = 3,alpha = 0.3)
+ggplot(vancouver_trees, aes(neighbourhood_name, diameter)) + geom_point(size = 3,alpha = 0.3)
+ggplot(vancouver_trees, aes(date_planted, diameter)) + geom_point(size = 3,alpha = 0.3)
+```
+
+**Exercise 4: Make a new variable "size"**
+```{r New Variable}
+# We want to investigate how many trees were planted in each neighborhood 
+# group_by(vancouver_trees, neighbourhood_name)
+# summarise(vancouver_trees, trees_per_neighbourhood = )
+
+# Make a new variable of Size
+Addsize <- mutate(vancouver_trees, size = height_range_id * diameter)
+range(select(Addsize, size))
+ggplot(Addsize, aes(size)) + geom_histogram(bins = 30)
+```
