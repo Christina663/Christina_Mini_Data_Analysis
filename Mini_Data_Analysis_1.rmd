@@ -8,19 +8,9 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
-## R Markdown
-You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r load library}
+library(datateachr)
+library(tidyverse)
 ```
 
 
@@ -37,6 +27,41 @@ plot(pressure)
 
 1. cancer_sample:
 ```{r cancer}
-cancer_sample
-#head(cancer_sample)
+# All numerical except for "diagnosis"
+# Special tibble data frame
+head(cancer_sample)
+class(cancer_sample)
+dim(cancer_sample)
 ```
+```{r apt_buildings}
+# Mostly categorical and binary
+head(apt_buildings) 
+class(apt_buildings)
+dim(apt_buildings)
+```
+```{r steam_games}
+# Special tibble data frame
+head(steam_games) 
+class(steam_games)
+dim(steam_games)
+```
+```{r vancouver_trees}
+# Categorical,binary and numerical
+head(vancouver_trees) 
+class(vancouver_trees)
+dim(vancouver_trees)
+```
+
+**1.3 Narrow down to 2 datasets:**
+After observing the datasets, we narrowed down to these two:
+1: apt_buildings
+2: vancouver_trees
+
+The logistics behind taking out the other two datasets are as follows: 
+First, the datasets "cancer_sample" and "steam_games" are both of the class type ("spec_tbl_df"). In the dataset "steam_games" we observed special data columns such as *complicated sentences* and *URLs*, which will possibly make data analysis more challenging and thus not what we want.
+Second, the dataset "cancer_sample" contains almost only numerical data. However, data of multiple types will be more valuable for us to practice data wrangling, such as the data of categorical, binary and numerical types in "vancouver_trees".
+
+**1.4 Final decision on dataset of interest**
+We have chosen the dataset "vancouver_trees" to investigate. We are interested for two reasons: 
+1. As mentioned, this dataset has various data types of categorical, binary and numerical, which will make our practice of data wrangling more thorough.
+2. I am interested in potentially investigate the spread of tree species among different regions and roads of Vancouver, and possibly form a comprehensive graph. Another possible direction is the relationship between heights, diameters and date planted of individual trees and how trees are spread within different regions.
