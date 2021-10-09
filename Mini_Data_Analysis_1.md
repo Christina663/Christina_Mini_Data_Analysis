@@ -1,0 +1,138 @@
+---
+title: "Milestone 1"
+author: "Christina Sun"
+date: "10/5/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r load library}
+library(ggplot2)
+library(datateachr)
+library(tidyverse)
+```
+
+
+## Task 1: Choose your favorite dataset (10 points)
+
+**1.1 Choose 4 datasets:**
+
+1: cancer_sample
+2: apt_buildings 
+3: steam_games
+4: vancouver_trees
+
+**1.2 Explore the datasets:**
+
+In this section we explore each of the 4 chosen datasets by printing out their head of data including names of columns and the first 6 rows, and their class types and dimensions. 
+
+1. cancer_sample:
+```{r cancer_sample}
+# Observations: All numerical except for "diagnosis"; Special tibble data frame
+head(cancer_sample)
+class(cancer_sample)
+dim(cancer_sample)
+```
+2: apt_buildings:
+```{r apt_buildings}
+# Observations: Mostly categorical and binary
+head(apt_buildings) 
+class(apt_buildings)
+dim(apt_buildings)
+```
+3: steam_games:
+```{r steam_games}
+# Observations: Special tibble data frame
+head(steam_games) 
+class(steam_games)
+dim(steam_games)
+```
+4: vancouver_trees:
+```{r vancouver_trees}
+# Observations: Categorical, binary and numerical
+head(vancouver_trees) 
+class(vancouver_trees)
+dim(vancouver_trees)
+```
+
+**1.3 Narrow down to 2 datasets:**
+
+After observing the datasets, we narrowed down to these two:
+1: apt_buildings
+2: vancouver_trees
+
+The logistics behind taking out the other two datasets are as follows: 
+First, the datasets "cancer_sample" and "steam_games" are both of the class type ("spec_tbl_df"). In the dataset "steam_games" we observed special data columns such as *complicated sentences* and *URLs*, which will possibly make data analysis more challenging and thus not what we want.
+Second, the dataset "cancer_sample" contains almost only numerical data. However, data of multiple types will be more valuable for us to practice data wrangling, such as the data of categorical, binary and numerical types in "vancouver_trees".
+
+**1.4 Final decision on dataset of interest**
+
+We have chosen the dataset "vancouver_trees" to investigate. We are interested for two reasons: 
+1. As mentioned, this dataset has various data types of categorical, binary and numerical, which will make our practice of data wrangling more thorough.
+2. I am interested in potentially investigate the spread of tree species among different regions and roads of Vancouver, and possibly form a comprehensive graph. Another possible direction is the relationship between heights, diameters and date planted of individual trees and how trees are spread within different regions.
+
+## Task 2: Exploring your dataset (15 points)
+
+**Exercise 1: Plot Density of "diameter"**
+
+Our dataset has a variety of tree diameters ranging from 0 to 435. We would like to explore how diameter is distributed among all tree samples by plotting the density of diameter. We also distinguish the density curve by "on curb" to investigate whether trees sitting on curb have significantly small diameter or not.
+
+Observing the original density plot, there are several data points with extremely large diameters that reduced visibility. After removing extremely large diameters, we observed that the distribution of tree diameters are centralized around 5, with a big tail extending to around 40. And the distribution are very similar for both trees on curb or not on curb, meaning that there is no obvious relationship between "diameter" and "on curb".
+```{r Plot Density}
+# Plot the density of diameter and distinguish by curb
+ggplot(vancouver_trees, aes(x = diameter)) + geom_density(aes(fill = curb),alpha = 0.3)
+# Observing max value of diameter
+max(select(vancouver_trees,diameter))
+large_diameter_removed <- filter(vancouver_trees, diameter < 50)
+# Re-plot the density after removing outliers 
+ggplot(large_diameter_removed, aes(x = diameter)) + geom_density(aes(fill = curb),alpha = 0.3)
+```
+
+
+**Exercise 2: Plot Variable Relationship between "diameter" and "date_planted"**
+
+We then make a point plot of "date_planted" v.s. "diameter" to find out if the diameter of the trees have increased over time. 
+We observed that the range of diameter shows a decline as date_planted increases, meaning that the older trees tend to have larger diameters, which proves our prediction.
+```{r Plot Variable Relationship}
+# Refine the range of diameter investigated to increase visibility
+more_diameter_removed <- filter(vancouver_trees, diameter < 30)
+ggplot(more_diameter_removed, aes(date_planted, diameter)) + geom_point(colour = "purple",size = 1,alpha = 0.02)
+```
+
+**Exercise 3: Make a new variable "size"**
+
+We are also interested in making a new variable "size" that is the volume of a tree calculated by its base area multiplied by its height. Looking at "size" gives a new perspective since trees with only "height" or "diameter" being large not necessarily leads to an impressive size. 
+Again, we then took out some outliers with extremely large size to make the plot more visible.
+```{r New Variable}
+# Make a new variable of "size"
+vancouver_trees <- mutate(vancouver_trees, size = height_range_id * pi * (diameter / 2)^2)
+range(select(vancouver_trees, size))
+# Remove extreme sizes
+large_size_removed = filter(vancouver_trees, size < 7.5*10^3)
+# Plot the density distribution of "size"
+ggplot(large_size_removed, aes(size)) + geom_density()
+```
+
+**Exercise 4: Make a new tibble with a subset of the data**
+
+The final exercise is to make a new tibble containing only trees of Japanese origins (i.e. trees that have common names starting with "Japanese"). We will also take out some variables that we are not interested in. In the following mini data analysis projects, we will use this refined dataset to investigate specific research questions targeted to trees of Japanese origins in Vancouver.
+```{r New Tibble}
+# Look at all common_name present in the dataset
+unique(select(vancouver_trees, common_name))
+# Select only those starting with Japanese and put into a variable of common_name
+selected_common_name = c("JAPANESE SNOWBELL", "JAPANESE DOGWOOD", "JAPANESE ZELKOVA", "JAPANESE BEECH", "JAPANESE MAPLE", "JAPANESE FLOWERING CRABAPPLE", "JAPANESE STEWARTIA", "JAPANESE STEWARTIA", "JAPANESE HORNBEAM", "JAPANESE PAGODA TREE", "JAPANESE CRYPTOMERIA", "JAPANESE WALNUT", "JAPANESE ANGELICA TREE", "JAPANESE WHITE PINE", "JAPANESE BLACK PINE", "JAPANESE CHESTNUT")
+# Create a new tibble containing only Japanese originated trees and take out some irrelevant variables and extreme values
+vancouver_trees %>%
+  select(-civic_number, -assigned, -cultivar_name, -street_side_name, -longitude, -latitude) %>%
+  filter(size < 7.5*10^3, diameter < 40) %>%
+  filter(common_name %in% selected_common_name)
+```
+
+## Task 3: Research Questions##
+
+1. For all trees that have common names starting with "Japanese", how are they spread across the city of Vancouver? Do they gather in groups by different species? Were they only planted in a small subarea of Vancouver? 
+2. For these "Japanese" trees of different species, how are their size related to their species? Which species have a tall and slim figure, and which have a short and round shape? 
+3. How are trees of different height spread across different areas within Vancouver? Do they follow any patterns (e.g. similar height on the same street)? 
+4. If investigating times of falling leaves for different tree species, how will it affect each areas of Vancouver with different color of trees, amount of tree shadow, etc? 
