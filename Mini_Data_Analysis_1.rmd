@@ -97,26 +97,33 @@ We then make a point plot of "date_planted" v.s. "diameter" to find out if the d
 We observed that the range of diameter shows a decline as date_planted increases, meaning that the older trees tend to have larger diameters, which proves our prediction.
 ```{r Plot Variable Relationship}
 # Refine the range of diameter investigated to increase visibility
-more_diameter_removed <- filter(vancouver_trees, diameter < 40)
+more_diameter_removed <- filter(vancouver_trees, diameter < 30)
 ggplot(more_diameter_removed, aes(date_planted, diameter)) + geom_point(colour = "purple",size = 1,alpha = 0.02)
 ```
 
 **Exercise 3: Make a new variable "size"**
 
-
+We are also interested in making a new variable "size" that is the volume of a tree calculated by its base area multiplied by its height. Looking at "size" gives a new perspective since trees with only "height" or "diameter" being large not necessarily leads to an impressive size. 
+Again, we then took out some outliers with extremely large size to make the plot more visible.
 ```{r New Variable}
-# We want to investigate how many trees were planted in each neighborhood 
-# Make a new variable of size
+# Make a new variable of "size"
 vancouver_trees <- mutate(vancouver_trees, size = height_range_id * pi * (diameter / 2)^2)
 range(select(vancouver_trees, size))
+# Remove extreme sizes
 large_size_removed = filter(vancouver_trees, size < 7.5*10^3)
+# Plot the density distribution of "size"
 ggplot(large_size_removed, aes(size)) + geom_density()
 ```
 
 **Exercise 4: Make a new tibble with a subset of the data**
+
+The final exercise is to make a new tibble containing only trees of Japanese origins (i.e. trees that have common names starting with "Japanese"). We will also take out some variables that we are not interested in. In the following mini data analysis projects, we will use this refined dataset to investigate specific research questions targeted to trees of Japanese origins in Vancouver.
 ```{r New Tibble}
+# Look at all common_name present in the dataset
 unique(select(vancouver_trees, common_name))
+# Select only those starting with Japanese and put into a variable of common_name
 selected_common_name = c("JAPANESE SNOWBELL", "JAPANESE DOGWOOD", "JAPANESE ZELKOVA", "JAPANESE BEECH", "JAPANESE MAPLE", "JAPANESE FLOWERING CRABAPPLE", "JAPANESE STEWARTIA", "JAPANESE STEWARTIA", "JAPANESE HORNBEAM", "JAPANESE PAGODA TREE", "JAPANESE CRYPTOMERIA", "JAPANESE WALNUT", "JAPANESE ANGELICA TREE", "JAPANESE WHITE PINE", "JAPANESE BLACK PINE", "JAPANESE CHESTNUT")
+# Create a new tibble containing only Japanese originated trees and take out some irrelevant variables and extreme values
 vancouver_trees %>%
   select(-civic_number, -assigned, -cultivar_name, -street_side_name, -longitude, -latitude) %>%
   filter(size < 7.5*10^3, diameter < 40) %>%
@@ -124,6 +131,7 @@ vancouver_trees %>%
 ```
 
 ## Task 3: Research Questions##
+
 1. For all trees that have common names starting with "Japanese", how are they spread across the city of Vancouver? Do they gather in groups by different species? Were they only planted in a small subarea of Vancouver? 
 2. For these "Japanese" trees of different species, how are their size related to their species? Which species have a tall and slim figure, and which have a short and round shape? 
 3. How are trees of different height spread across different areas within Vancouver? Do they follow any patterns (e.g. similar height on the same street)? 
