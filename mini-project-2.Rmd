@@ -1,0 +1,130 @@
+---
+title: "Mini Data Analysis Milestone 2"
+output: github_document
+---
+
+# Welcome back to my mini data analysis project!
+
+This time, we will explore more in depth the concept of *tidy data*, and investigate further into my research questions that was defined in milestone 1. We will be using the dataset "vancouver_trees" to investigate patterns of Japanese originated tree species spreading across the area of Vancouver. Let's get started!
+
+Begin by loading data, and the packages datateachr, tidyverse, ggplot2 as follows: 
+
+```{r, message = FALSE}
+suppressPackageStartupMessages(library(datateachr)) # <- might contain the data you picked!
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(ggplot2))
+```
+
+# Task 1: Process and summarize your data (15 points)
+
+From milestone 1, we have an idea of the basic structure of my dataset (e.g. number of rows and columns, class types,a lot of NA values, etc.). Here, we will start investigating your data more in-depth using various data manipulation functions. 
+
+### 1.1 (2.5 points) 
+
+First, write out the 4 research questions you defined in milestone 1 were. This will guide your work through milestone 2:
+
+<!-------------------------- Student work below ---------------------------->
+1. For all trees that have common names starting with "Japanese", how are they spread across the city of Vancouver? Do they gather in groups by different species? Were they only planted in a small subarea of Vancouver? 
+2. For these "Japanese" trees of different species, how are their size related to their species? Which species have a tall and slim figure, and which have a short and round shape? 
+3. How are trees of different heights spread across different areas within Vancouver? Do they follow any patterns (e.g. similar height on the same street)? 
+4. If investigating times of falling leaves for different tree species, how will it affect each areas of Vancouver with different color of trees, amount of tree shadow, etc? 
+<!----------------------------------------------------------------------------->
+
+### 1.2 (10 points)
+
+Now, for each of my four research questions, I will choose one task from options 1-4 (summarizing), and one other task from 4-8 (graphing). 
+
+**Summarizing:**
+
+1. Compute the *range*, *mean*, and *two other summary statistics* of **one numerical variable** across the groups of **one categorical variable** from your data.
+2. Compute the number of observations for at least one of your categorical variables. Do not use the function `table()`!
+3. Create a categorical variable with 3 or more groups from an existing numerical variable. You can use this new variable in the other tasks! *An example: age in years into "child, teen, adult, senior".*
+4. Based on two categorical variables, calculate two summary statistics of your choosing.
+
+**Graphing:**
+
+5. Create a graph out of summarized variables that has at least two geom layers.
+6. Create a graph of your choosing, make one of the axes logarithmic, and format the axes labels so that they are "pretty" or easier to read. 
+7. Make a graph where it makes sense to customize the alpha transparency.
+8. Create 3 histograms out of summarized variables, with each histogram having different sized bins. Pick the "best" one and explain why it is the best.
+
+<!------------------------- Student work below ----------------------------->
+*Research Question 3:*
+*Summarizing task 1 - Compute summary statistics of one numerical variable across one categorical variable*
+We will look at different categories of "neighbourhood_name" of the trees and explore their height statistics (e.g. range, mean, max and standard deviation):
+
+```{r}
+answer3.1 <- vancouver_trees %>%
+  group_by(neighbourhood_name) %>%
+  summarise(height_mean = mean(height_range_id, na.rm = TRUE), height_max = max(height_range_id, na.rm = TRUE), height_range = range(height_range_id, na.rm = TRUE), height_std = sd(height_range_id, na.rm = TRUE))
+  
+print(answer3.1)
+```
+
+*Graphing task 7 - Graph with alpha transparency*
+We will group all the neighborhoods by the streets they are located on, and for each street we plot the mean heights of trees against each neighborhood on the street (i.e. y = mean height, x = neighborhood).
+```{r}
+
+```
+
+<!----------------------------------------------------------------------------->
+
+### 1.3 (2.5 points)
+
+Based on the operations that you've completed, how much closer are you to answering your research questions? Think about what aspects of your research questions remain unclear. Can your research questions be refined, now that you've investigated your data a bit more? Which research questions are yielding interesting results?
+
+<!------------------------- Write your answer here ---------------------------->
+
+
+<!----------------------------------------------------------------------------->
+
+# Task 2: Tidy your data (12.5 points)
+
+In this task, we will do several exercises to reshape our data. The goal here is to understand how to do this reshaping with the `tidyr` package.
+
+A reminder of the definition of *tidy* data:
+
+- Each row is an **observation**
+- Each column is a **variable**
+- Each cell is a **value**
+
+*Tidy'ing* data is sometimes necessary because it can simplify computation. Other times it can be nice to organize data so that it can be easier to understand when read manually. 
+
+### 2.1 (2.5 points)
+
+Based on the definition above, can you identify if your data is tidy or untidy? Go through all your columns, or if you have >8 variables, just pick 8, and explain whether the data is untidy or tidy.
+
+<!--------------------------- Start your work below --------------------------->
+
+
+<!----------------------------------------------------------------------------->
+
+### 2.2 (5 points)
+
+Now, if your data is tidy, untidy it! Then, tidy it back to it's original state.
+
+If your data is untidy, then tidy it! Then, untidy it back to it's original state.
+
+Be sure to explain your reasoning for this task. Show us the "before" and "after".
+
+<!--------------------------- Start your work below --------------------------->
+
+
+<!----------------------------------------------------------------------------->
+
+### 2.3 (5 points)
+
+Now, you should be more familiar with your data, and also have made progress in answering your research questions. Based on your interest, and your analyses, pick 2 of the 4 research questions to continue your analysis in milestone 3, and explain your decision. 
+
+Try to choose a version of your data that you think will be appropriate to answer these 2 questions in milestone 3. Use between 4 and 8 functions that we've covered so far (i.e. by filtering, cleaning, tidy'ing, dropping irrelvant columns, etc.). 
+
+<!--------------------------- Start your work below --------------------------->
+
+
+<!----------------------------------------------------------------------------->
+
+*When you are done, knit an `md` file. This is what we will mark! Make sure to open it and check that everything has knitted correctly before submitting your tagged release.*
+
+### Attribution
+
+Thanks to Victor Yuan for mostly putting this together. 
