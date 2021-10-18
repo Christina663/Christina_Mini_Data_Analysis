@@ -75,10 +75,32 @@ From the line plot, we can conclude that there are two species that are extremel
 *Research Question 2:*
 *For these "Japanese" trees of different species, how are their size related to their species? Which species have a tall and slim figure, and which have a short and round shape?*
 
-*Summarizing task 
+*Summarizing task 3 - Make new categorical variable*
+We will make a set of new variables: "height_level" and "diameter_level" to classify these two parameters into categories. We will have heights as "tall", "medium" or "short" and diameters as "thick", "medium" and "slim". 
+```{r}
+print(range(select(vancouver_trees, height_range_id)))
+print(range(select(vancouver_trees, diameter)))
+vancouver_trees %>%
+  mutate(height_level = case_when(height_range_id < 3 ~ "short",
+                                 height_range_id < 6 ~ "medium",
+                                 TRUE ~ "tall")) %>%
+  mutate(diameter_level = case_when(diameter < 10 ~ "slim",
+                                 diameter < 30 ~ "medium",
+                                 TRUE ~ "thick"))
+```
+From the tibble above, we have a better understanding of the distribution of height and diameter of different Japanese tree species and thus helps us comprehend research question 2. We can just look at the new variables "height_level" and "diameter_level", and make the observation that most trees are in the medium category, for both height and diameter; and we can continue working with these new variables and explore the relationship between species and height, weight levels!
 
 
-
+*Graphing task
+We are going to explore the distribution of trees height and diameter across each species. In other words, we observing which species have larger heights and/or diameters, and which have smaller heights and/or diameters. A line plot will be used to demonstrate the distribution. We also filtered out species to only include five species that sound pretty!
+```{r}
+vancouver_trees %>%
+  filter(common_name %in% c("JAPANESE SNOWBELL", "JAPANESE DOGWOOD", "JAPANESE ZELKOVA", "JAPANESE BEECH","JAPANESE MAPLE")) %>%
+  group_by(common_name) %>%
+  summarise(height_mean = mean(height_range_id, na.rm = TRUE), diameter_mean = mean(diameter, na.rm = TRUE)) %>%
+  ggplot(aes(x = common_name)) + geom_line(aes(y = height_mean), group = 1, color = "red") + geom_line(aes(y = diameter_mean), group = 1, color = "green") + geom_point(aes(y = height_mean), color = "black", size = 3) + geom_point(aes(y = diameter_mean), color = "black", size = 3)
+```
+From the line plots above, we can observe the height-diameter relationship for the five tree species that we chose. For example: JAPANESE ZELKOVA and JAPANESE BEECH both have large heights and diameters (i.e. tall and thick), and JAPANESE SNOWBELL has both small heights and diameters (i.e. short and slim). These comparison between the height plot and diameter plot helps us easily identify the relationship we want from research question 2.
 
 *Research Question 3:*
 *How are trees of different heights spread across different areas within Vancouver? Do they follow any patterns (e.g. similar height on the same street)?*
@@ -107,6 +129,8 @@ vancouver_trees %>%
  
 ```
 From the plot above, we can see that each neighborhoods along the Dunbar Southlands street of Vancouver has Japanese trees of different mean heights, specifically the neighborhoods that are closer to the sea have larger mean height values, which answers the research question 3, again.
+
+*Research Question 4:*
 <!----------------------------------------------------------------------------->
 
 ### 1.3 (2.5 points)
