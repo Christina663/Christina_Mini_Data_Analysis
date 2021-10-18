@@ -49,7 +49,39 @@ Now, for each of my four research questions, I will choose one task from options
 8. Create 3 histograms out of summarized variables, with each histogram having different sized bins. Pick the "best" one and explain why it is the best.
 
 <!------------------------- Student work below ----------------------------->
+*Research Question 1:*
+*For all trees that have common names starting with "Japanese", how are they spread across the city of Vancouver? Do they gather in groups by different species? Were they only planted in a small subarea of Vancouver?*
+*Summarizing task 2 - Count number of observations for categorical variables*
+We will look at different species of the Japanese trees and how each species are distributed among different neighborhoods in the city of Vancouver. We apply the summarise() function to sort all Japanese trees into groups of neighborhood names and their species, and count the number of trees per species inside each neighborhood.
+
+```{r}
+answer1.1 <- vancouver_trees %>%
+  group_by(neighbourhood_name, common_name) %>%
+  summarise(n = n())
+  
+print(answer1.1)  
+```
+From the tibble above, we observe very spread-out number of trees for different species, for example, we have 92 "AMERICAN ELM" in the neighborhood ARBUTUS-RIDGE, whereas the other species are around 10 in this neighborhood. Thus  helps us understand the distribution of tree species from research question 1.
+
+*Graphing task 5 - Graph with two geom layers*
+Continuing with the summarised tibble from above, we will focus on the spread of trees of different species on the specific street "Dunbar Southlands" which stretches from west to east of Vancouver. In total there are 7 neighborhoods along the street, and we will plot the distribution of number of trees among different species, for each neighborhood on the street.
+```{r}
+answer1.1 %>%
+filter(neighbourhood_name %in% c("DUNBAR-SOUTHLANDS", "ARBUTUS-RIDGE", "SHAUGHNESSY", "RILEY PARK",  "KENSINGTON-CEDAR COTTAGE", "RENFREW-COLLINGWOOD") ) %>%
+  ggplot(aes(x = common_name, y = n)) + geom_point(color = "pink") + geom_line(color = "purple", group = 1) + facet_wrap("neighbourhood_name") + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+```
+From the line plot, we can conclude that there are two species that are extremely common in all of the neighborhood on "Dunbar Southlands". Specifically, there are two significant spikes on every line plot that are of the exact same x value, meaning these two species have large counts for all the facets. This helps us gain better understanding of the tree species distribution by explicitly presenting their counts comparing to other species.
+
+*Research Question 2:*
+*For these "Japanese" trees of different species, how are their size related to their species? Which species have a tall and slim figure, and which have a short and round shape?*
+
+*Summarizing task 
+
+
+
+
 *Research Question 3:*
+*How are trees of different heights spread across different areas within Vancouver? Do they follow any patterns (e.g. similar height on the same street)?*
 *Summarizing task 1 - Compute summary statistics of one numerical variable across one categorical variable*
 We will look at different categories of "neighbourhood_name" of the trees and explore their height statistics (e.g. range, mean, max and standard deviation):
 
@@ -60,13 +92,21 @@ answer3.1 <- vancouver_trees %>%
   
 print(answer3.1)
 ```
+From the summarized tibble above, we can observe the height characteristics of trees based on variables such as mean height, max heights, etc.This helps understand my research question 3 in how heights of Japanese trees are spread across different neighborhoods in Vancouver.
 
-*Graphing task 7 - Graph with alpha transparency*
-We will group all the neighborhoods by the streets they are located on, and for each street we plot the mean heights of trees against each neighborhood on the street (i.e. y = mean height, x = neighborhood).
+*Graphing task 5 - Graph with two geom layers*
+We will investigate the spread of trees of different height on the specific street "Dunbar Southlands", and plot the mean heights of trees against each neighborhood on the street (i.e. y = mean height, x = neighborhood).
 ```{r}
-
+ # Filter the summarized tibble to include only neighborhoods along Dunbar Southland
+vancouver_trees %>%
+  group_by(neighbourhood_name) %>%
+  summarise(height_mean = mean(height_range_id, na.rm = TRUE), height_max = max(height_range_id, na.rm = TRUE), height_std = sd(height_range_id, na.rm = TRUE)) %>%
+  filter(neighbourhood_name %in% c("DUNBAR-SOUTHLANDS", "ARBUTUS-RIDGE", "SHAUGHNESSY", "RILEY PARK",  "KENSINGTON-CEDAR COTTAGE", "RENFREW-COLLINGWOOD") ) %>%
+  # Plot height means of each neighborhood, with both a geom_point layer and geom_col to display the trends of tree heights along the street, changing from west to east of the street.
+  ggplot(aes(x = neighbourhood_name, y = height_mean)) + geom_point(size = 5, color = 'black') + geom_col(fill = 'pink')+ theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+ 
 ```
-
+From the plot above, we can see that each neighborhoods along the Dunbar Southlands street of Vancouver has Japanese trees of different mean heights, specifically the neighborhoods that are closer to the sea have larger mean height values, which answers the research question 3, again.
 <!----------------------------------------------------------------------------->
 
 ### 1.3 (2.5 points)
