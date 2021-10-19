@@ -118,16 +118,16 @@ From the line plots above, we can observe the height-diameter relationship for t
 *Research Question 3:*
 *How are trees of different heights spread across different areas within Vancouver? Do they follow any patterns (e.g. similar height on the same street)?*
 *Summarizing task 1 - Compute summary statistics of one numerical variable across one categorical variable*
-We will look at different categories of "neighbourhood_name" of the trees and explore their height statistics (e.g. range, mean, max and standard deviation):
+We will look at different categories of "neighbourhood_name" of the trees and explore their height statistics (e.g. mean, range, standard deviation, count of trees per neighborhood):
 
 ```{r}
 answer3.1 <- vancouver_trees %>%
   group_by(neighbourhood_name) %>%
-  summarise(height_mean = mean(height_range_id, na.rm = TRUE), height_max = max(height_range_id, na.rm = TRUE), height_range = range(height_range_id, na.rm = TRUE), height_std = sd(height_range_id, na.rm = TRUE))
+  summarise(height_mean = mean(height_range_id, na.rm = TRUE), height_min = min(height_range_id, na.rm = TRUE), height_max = max(height_range_id, na.rm = TRUE), height_std = sd(height_range_id, na.rm = TRUE), count = n())
   
 print(answer3.1)
 ```
-From the summarized tibble above, we can observe the height characteristics of trees based on variables such as mean height, max heights, etc.This helps understand my research question 3 in how heights of Japanese trees are spread across different neighborhoods in Vancouver.
+From the summarized tibble above, we can observe the height characteristics of trees based on different statistical variables such as mean, standard deviation, range and count per group, etc.This helps understand my research question 3 in how heights of Japanese trees are spread across different neighborhoods in Vancouver.
 
 *Graphing task 5 - Graph with two geom layers*
 We will investigate the spread of trees of different height on the specific street "Dunbar Southlands", and plot the mean heights of trees against each neighborhood on the street (i.e. y = mean height, x = neighborhood).
