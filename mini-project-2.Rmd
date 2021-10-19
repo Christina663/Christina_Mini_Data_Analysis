@@ -49,6 +49,19 @@ Now, for each of my four research questions, I will choose one task from options
 8. Create 3 histograms out of summarized variables, with each histogram having different sized bins. Pick the "best" one and explain why it is the best.
 
 <!------------------------- Student work below ----------------------------->
+Before we dive into our research questions, let's update our dataset to the refined one from last milestone - we use this new dataset with unnecessary variables and extreme values taken out and keep only the trees of Japanese origin. 
+```{r}
+# Look at all common_name present in the dataset
+unique(select(vancouver_trees, common_name))
+# Select only those starting with Japanese and put into a variable of common_name
+selected_common_name = c("JAPANESE SNOWBELL", "JAPANESE DOGWOOD", "JAPANESE ZELKOVA", "JAPANESE BEECH", "JAPANESE MAPLE", "JAPANESE FLOWERING CRABAPPLE", "JAPANESE STEWARTIA", "JAPANESE STEWARTIA", "JAPANESE HORNBEAM", "JAPANESE PAGODA TREE", "JAPANESE CRYPTOMERIA", "JAPANESE WALNUT", "JAPANESE ANGELICA TREE", "JAPANESE WHITE PINE", "JAPANESE BLACK PINE", "JAPANESE CHESTNUT")
+# Create a new tibble containing only Japanese originated trees and take out some irrelevant variables and extreme values
+Japanese_trees <- vancouver_trees %>%
+  select(-civic_number, -assigned, -cultivar_name, -street_side_name, -longitude, -latitude) %>%
+  #filter(size < 7.5*10^3, diameter < 40) %>%
+  filter(common_name %in% selected_common_name)
+```
+
 *Research Question 1:*
 *For all trees that have common names starting with "Japanese", how are they spread across the city of Vancouver? Do they gather in groups by different species? Were they only planted in a small subarea of Vancouver?*
 *Summarizing task 2 - Count number of observations for categorical variables*
@@ -131,6 +144,47 @@ vancouver_trees %>%
 From the plot above, we can see that each neighborhoods along the Dunbar Southlands street of Vancouver has Japanese trees of different mean heights, specifically the neighborhoods that are closer to the sea have larger mean height values, which answers the research question 3, again.
 
 *Research Question 4:*
+*If investigating times of falling leaves for different tree species, how will it affect each areas of Vancouver with different color of trees, amount of tree shadow, etc?*
+
+*Summarizing task 3 - Compute number of observations*
+And for our last research question, we will be investigating the color of fall foliage (i.e. tree colors in fall) of the Japanese trees across Vancouver, specifically in those eight neighborhoods along Dunbar Southlands! We will first do some research to find out what are the fall foliage like for each different tree species, and make a new categorical variable named "fall foliage" and fill out for each observation. And finally we will summarize the count of each foliage color in each neighborhood.
+
+
+```{r}
+answer4.1 <- Japanese_trees %>%
+  mutate(fall_foliage = case_when(common_name == "JAPANESE SNOWBELL" ~ "red",
+                                  common_name == "JAPANESE ZELKOVA" ~ "red",
+                                  common_name == "JAPANESE MAPLE" ~ "brown",
+                                  common_name == "JAPANESE FLOWERING CRABAPPLE" ~ "yellow",
+                                  common_name == "JAPANESE STEWARTIA" ~ "red",
+                                  common_name == "JAPANESE HORNBEAM" ~ "yellow",
+                                  common_name == "JAPANESE PAGODA TREE" ~ "yellow",
+                                  common_name == "JAPANESE CRYPTOMERIA" ~ "brown",
+                                  common_name == "JAPANESE WALNUT" ~ "yellow",
+                                  common_name == "JAPANESE ANGELICA TREE" ~ "brown",
+                                  common_name == "JAPANESE WHITE PINE" ~ "green",
+                                  common_name == "JAPANESE BLACK PINE" ~ "green",
+                                  common_name == "JAPANESE CHESTNUT" ~ "red",
+                                 TRUE ~ "NA")) %>%
+  select(tree_id, common_name, neighbourhood_name, fall_foliage) %>%
+  filter(fall_foliage != "NA") %>%
+  group_by(neighbourhood_name, fall_foliage) 
+print(answer4.1)
+summarise(answer4.1, count = n())
+
+```
+From the summarized tibble above, we can easily observe the count for each fall foliage color (i.e. yellow, red, brown or green) for each neighborhood. And by looking at these count and the difference between them, we can thus gain a better understanding of research question 4 in how trees of different fall foliage colors are spread across each neighborhood.
+
+*Graphing task 
+*Now we would like to continue with fall foliage colors and make visualizations of how each neighborhood looks like when filled in with different colors of trees! We will make point plots of each tree observation showing their color on the plot.
+
+```{r}
+answer4.1 %>%
+  #filter(neighbourhood_name == "DUNBAR-SOUTHLANDS") %>%
+  #summarise(answer4.1, count = n()) %>%
+  ggplot(aes(neighbourhood_name, y = fall_foliage)) + geom_jitter(alpha = 0.3, width  = 0.2) # How to show different colors?
+```
+From the plot ablove, ...
 <!----------------------------------------------------------------------------->
 
 ### 1.3 (2.5 points)
