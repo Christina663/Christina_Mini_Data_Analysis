@@ -89,11 +89,11 @@ Here, re-ordering the factor of "common_name" is essential for our understanding
 ```{r}
 #month(refined_trees$date_planted)
 answer1.2 <- refined_trees %>%
-  mutate(month = month(refined_trees$date_planted))
+  mutate(year = year(refined_trees$date_planted))
 print(answer1.2)
 
 ```
-LEFT HERE @ 7:30 PM 
+If we would like to investigate the spread of Japanese trees across Vancouver regarding their ages, we would be interested in only the year they were planted. Thus the new column containing only the year planted would be useful and tidy.
 <!----------------------------------------------------------------------------->
 
     
@@ -102,42 +102,33 @@ LEFT HERE @ 7:30 PM
 
 ## 2.0 (no points)
 
-Pick a research question, and pick a variable of interest (we'll call it "Y") that's relevant to the research question. Indicate these.
+**Research Question**: If investigating times of falling leaves for different tree species, how will it affect each areas of Vancouver with different color of trees, amount of tree shadow, etc?
 
-<!-------------------------- Start your work below ---------------------------->
+**Variable of interest**: Y = size, of the particular tree species "JAPANESE SNOWBELL".
 
-**Research Question**: FILL_THIS_IN
-
-**Variable of interest**: FILL_THIS_IN
-
-<!----------------------------------------------------------------------------->
+And by fitting the tree size and its age into a linear model, we expect to find the tree size increases as age gets bigger. We will then know the speed JAPANESE SNOWBELL grows as years go by, which helps us determine the amount of falling leaves this species will produce each year and in the future. If we would repeat this process for other tree species, we would obtain different growing speed and corresponding falling leaves amount, from which we can better answer the question!
 
 ## 2.1 (5 points)
 
-Fit a model or run a hypothesis test that provides insight on this variable with respect to the research question. Store the model object as a variable, and print its output to screen. We'll omit having to justify your choice, because we don't expect you to know about model specifics in STAT 545. 
+```{r}
+answer1.2 <- answer1.2 %>%
+  filter(common_name == "JAPANESE SNOWBELL") %>%
+  mutate(age = 2021 - year)
+answer2.1 <-  lm(size ~ age, answer1.2)
+print(answer2.1)
 
-- **Note**: It's OK if you don't know how these models/tests work. Here are some examples of things you can do here, but the sky's the limit. 
-    - You could fit a model that makes predictions on Y using another variable, by using the `lm()` function.
-    - You could test whether the mean of Y equals 0 using `t.test()`, or maybe the mean across two groups are different using `t.test()`, or maybe the mean across multiple groups are different using `anova()` (you may have to pivot your data for the latter two).
-    - You could use `lm()` to test for significance of regression.
+ggplot(answer1.2, aes(x = age, y = size)) + geom_jitter(color = "orange")
+```
 
-<!-------------------------- Start your work below ---------------------------->
-
-
-<!----------------------------------------------------------------------------->
 
 ## 2.2 (5 points)
 
-Produce something relevant from your fitted model: either predictions on Y, or a single value like a regression coefficient or a p-value. 
+```{r}
+print(answer2.1)
+```
 
-- Be sure to indicate in writing what you chose to produce. 
-- Your code should either output a tibble (in which case you should indicate the column that contains the thing you're looking for), or the thing you're looking for itself.
-- Obtain your results using the `broom` package if possible. If your model is not compatible with the broom function you're needing, then you can obtain your results by some other means, but first indicate which broom function is not compatible. 
-  
-<!-------------------------- Start your work below ---------------------------->
+One valuable parameter we obtained from the linear model is the regression coefficients: 1.976 (observed from the printed results). We thus obtained the speed that "JAPANESE SNOWBELL" is growing across Vancouver(it grows 1.976 size units per year on average). 
 
-
-<!----------------------------------------------------------------------------->
 
 
 
@@ -147,26 +138,53 @@ Get set up for this exercise by making a folder called `output` in the top level
 
 ## 3.1 (5 points)
 
-Take a summary table that you made from Milestone 2 (Exercise 1.2), and write it as a csv file in your `output` folder. Use the `here::here()` function.
+We now take a summary table from Milestone 2 (Exercise 1.2), and write it as a csv file in my `output` folder. Use the `here::here()` function.
 
-- **Robustness criteria**: You should be able to move your Mini Project repository / project folder to some other location on your computer, or move this very Rmd file to another location within your project repository / folder, and your code should still work.
-- **Reproducibility criteria**: You should be able to delete the csv file, and remake it simply by knitting this Rmd file. 
-  
 <!-------------------------- Start your work below ---------------------------->
+Let's remake our summarized foliage count table from milestone 2:
+```{r}
+Japanese_trees <- vancouver_trees %>%
+  select(-civic_number, -assigned, -cultivar_name, -street_side_name, -longitude, -latitude) %>%
+  #filter(size < 7.5*10^3, diameter < 40) %>%
+  filter(common_name %in% selected_common_name)
+summarized <- Japanese_trees %>%
+  mutate(fall_foliage = case_when(common_name == "JAPANESE SNOWBELL" ~ "red",
+                                  common_name == "JAPANESE ZELKOVA" ~ "red",
+                                  common_name == "JAPANESE MAPLE" ~ "brown",
+                                  common_name == "JAPANESE FLOWERING CRABAPPLE" ~ "yellow",
+                                  common_name == "JAPANESE STEWARTIA" ~ "red",
+                                  common_name == "JAPANESE HORNBEAM" ~ "yellow",
+                                  common_name == "JAPANESE PAGODA TREE" ~ "yellow",
+                                  common_name == "JAPANESE CRYPTOMERIA" ~ "brown",
+                                  common_name == "JAPANESE WALNUT" ~ "yellow",
+                                  common_name == "JAPANESE ANGELICA TREE" ~ "brown",
+                                  common_name == "JAPANESE WHITE PINE" ~ "green",
+                                  common_name == "JAPANESE BLACK PINE" ~ "green",
+                                  common_name == "JAPANESE CHESTNUT" ~ "red",
+                                 TRUE ~ "NA")) %>%
+  select(tree_id, common_name, neighbourhood_name, fall_foliage, height_range_id) %>%
+  filter(fall_foliage != "NA") %>%
+  group_by(neighbourhood_name, fall_foliage) %>%
+  summarise(count = n())
+print(summarized)
+```
 
-
+```{r}
+here::here()
+# dir.create(here::here("output"))
+write_csv(summarized, here::here("output", "exported_foliage_count.csv"))
+```
 <!----------------------------------------------------------------------------->
 
 ## 3.2 (5 points)
 
-Write your model object from Exercise 2 to an R binary file (an RDS), and load it again. Be sure to save the binary file in your `output` folder. Use the functions `saveRDS()` and `readRDS()`. 
+Write our model object from Exercise 2 to an R binary file (an RDS), and load it again. Be sure to save the binary file in our `output` folder. Use the functions `saveRDS()` and `readRDS()`. 
 
-- The same robustness and reproducibility criteria as in 3.1 apply here.
+```{r}
+saveRDS(answer2.1, here::here("output", "binary_size_age_linear_model"))
+model <- readRDS(here::here("output", "binary_size_age_linear_model"))
+```
 
-<!-------------------------- Start your work below ---------------------------->
-
-
-<!----------------------------------------------------------------------------->
 
 # Tidy Repository
 
