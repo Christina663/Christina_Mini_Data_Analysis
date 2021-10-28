@@ -1,6 +1,6 @@
 ---
 title: "Mini Data-Analysis Deliverable 3"
-output: output: github_document
+output: github_document
 ---
 
 
@@ -57,35 +57,32 @@ print(refined_trees)
 
 # Exercise 1: Special Data Types (10)
 
-For this exercise, you'll be choosing two of the three tasks below:
+For this exercise, we'll be choosing two of the three tasks below:
 
-1. Produce a new plot that reorders a factor in your original plot, using the `forcats` package (3 points). Then, in a sentence or two, briefly explain why you chose this ordering (1 point here for demonstrating understanding of the reordering, and 1 point for demonstrating some justification for the reordering, which could be subtle or speculative.)
+1. Produce a new plot that reorders a factor in your original plot, using the `forcats` package 
 
-2. Produce a new plot that groups some factor levels together into an "other" category (or something similar), using the `forcats` package (3 points). Then, in a sentence or two, briefly explain why you chose this grouping (1 point here for demonstrating understanding of the grouping, and 1 point for demonstrating some justification for the grouping, which could be subtle or speculative.)
+2. Produce a new plot that groups some factor levels together into an "other" category (or something similar), using the `forcats` package 
 
 3. If your data has some sort of time-based column like a date (but something more granular than just a year):
-    1. Make a new column that uses a function from the `lubridate` or `tsibble` package to modify your original time-based column. (3 points)
-        - Note that you might first have to _make_ a time-based column using a function like `ymd()`, but this doesn't count.
-        - Examples of something you might do here: extract the day of the year from a date, or extract the weekday, or let 24 hours elapse on your dates.
-    2. Then, in a sentence or two, explain how your new column might be useful in exploring a research question. (1 point for demonstrating understanding of the function you used, and 1 point for your justification, which could be subtle or speculative).
-        - For example, you could say something like "Investigating the day of the week might be insightful because penguins don't work on weekends, and so may respond differently".
-
-<!-------------------------- Start your work below ---------------------------->
-*Task 1 (for research question 1): *
+    1. Make a new column that uses a function from the `lubridate` or `tsibble` package to modify your original time-based column. 
+    2. Then, in a sentence or two, explain how your new column might be useful in exploring a research question.
+        
+*Task 1 (for research question 1):*
 ```{r}
 # Summarize counts of trees per species for each neighborhood
 answer1.1 <- refined_trees %>%
-  filter(neighbourhood_name %in% c("DUNBAR-SOUTHLANDS", "SHAUGHNESSY", "RILEY PARK",  "KENSINGTON-CEDAR COTTAGE", "RENFREW-COLLINGWOOD") )  %>%
-  group_by(neighbourhood_name) %>%
+  filter(neighbourhood_name %in% c("DUNBAR-SOUTHLANDS", "SHAUGHNESSY", "RENFREW-COLLINGWOOD") )  %>%
+#  group_by(neighbourhood_name) %>%
 # Reorder the common name factor based on a descending count of observations
   mutate(common_name  = fct_infreq(common_name))
 attributes(answer1.1$common_name)
 print(answer1.1)
-ggplot(answer1.1, aes(common_name)) + geom_bar() + facet_wrap("neighbourhood_name") + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+ggplot(answer1.1, aes(x = common_name)) + geom_bar(aes(fill = neighbourhood_name)) + scale_x_discrete(guide = guide_axis(n.dodge=5)) + labs(title="Counts of Japanese trees of each common name in descending order")
 ```
+
 Here, re-ordering the factor of "common_name" is essential for our understanding, since after re-ordering we can easily observe the common trends of descending counts shared among all neighborhood. Thus we can conclude that the first two tree species are most common for each neighborhood, and the spread of other species are of very similar patterns as well!
 
-*Task 2:*
+*Task 2 (for research question 1)*
 ```{r}
 #month(refined_trees$date_planted)
 answer1.2 <- refined_trees %>%
@@ -93,9 +90,7 @@ answer1.2 <- refined_trees %>%
 print(answer1.2)
 
 ```
-If we would like to investigate the spread of Japanese trees across Vancouver regarding their ages, we would be interested in only the year they were planted. Thus the new column containing only the year planted would be useful and tidy.
-<!----------------------------------------------------------------------------->
-
+If we would like to investigate the spread of Japanese trees across Vancouver in terms of their ages, we would be interested in only the year they were planted. Thus the new column containing only the year planted would be useful and tidy.
     
 
 # Exercise 2: Modelling
@@ -117,12 +112,14 @@ answer1.2 <- answer1.2 %>%
 answer2.1 <-  lm(size ~ age, answer1.2)
 print(answer2.1)
 
-ggplot(answer1.2, aes(x = age, y = size)) + geom_jitter(color = "orange")
+ggplot(answer1.2, aes(x = age, y = size)) + geom_jitter(color = "orange") + theme(aspect.ratio=1)
 ```
 
+And here is a plot just for fun: we observe an expected trend of increasing size as trees age increases.
 
 ## 2.2 (5 points)
 
+We now produce the regression co-efficents of our linear model:
 ```{r}
 print(answer2.1)
 ```
@@ -130,17 +127,12 @@ print(answer2.1)
 One valuable parameter we obtained from the linear model is the regression coefficients: 1.976 (observed from the printed results). We thus obtained the speed that "JAPANESE SNOWBELL" is growing across Vancouver(it grows 1.976 size units per year on average). 
 
 
-
-
 # Exercise 3: Reading and writing data
-
-Get set up for this exercise by making a folder called `output` in the top level of your project folder / repository. You'll be saving things there. 
 
 ## 3.1 (5 points)
 
 We now take a summary table from Milestone 2 (Exercise 1.2), and write it as a csv file in my `output` folder. Use the `here::here()` function.
 
-<!-------------------------- Start your work below ---------------------------->
 Let's remake our summarized foliage count table from milestone 2:
 ```{r}
 Japanese_trees <- vancouver_trees %>%
@@ -174,7 +166,6 @@ here::here()
 # dir.create(here::here("output"))
 write_csv(summarized, here::here("output", "exported_foliage_count.csv"))
 ```
-<!----------------------------------------------------------------------------->
 
 ## 3.2 (5 points)
 
@@ -184,6 +175,8 @@ Write our model object from Exercise 2 to an R binary file (an RDS), and load it
 saveRDS(answer2.1, here::here("output", "binary_size_age_linear_model"))
 model <- readRDS(here::here("output", "binary_size_age_linear_model"))
 ```
+
+And here is our csv file and binary file that can be found in the output folder inside of our mini project folder!
 
 
 # Tidy Repository
@@ -223,8 +216,8 @@ PS: there's a way where you can run all project code using a single command, ins
 
 ## Error-free code (1 point)
 
-This Milestone 3 document knits error-free. (We've already graded this aspect for Milestone 1 and 2)
+This Milestone 3 document knits error-free. 
 
 ## Tagged release (1 point)
 
-You've tagged a release for Milestone 3. (We've already graded this aspect for Milestone 1 and 2)
+We've tagged a release for Milestone 3. 
