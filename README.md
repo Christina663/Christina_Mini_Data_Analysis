@@ -10,6 +10,7 @@ Milestone Folders:
 + README
 + .rmd file
 + .md file
++ Figure subfolder
 
 Output Folders:
 + Graph results
